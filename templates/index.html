@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Blockcert Manager</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+    <style>
+      html, body {
+        height: 100%;
+      }
+      body {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: center;
+        align-items: center;
+        padding-top: 40px;
+        padding-bottom: 40px;
+        background-color: #f5f5f5;
+      }
+
+      form {
+        width: 100%;
+        max-width: 500px;
+        padding: 15px;
+        margin: auto;
+      }
+      form .form-control {
+        position: relative;
+        box-sizing: border-box;
+        height: auto;
+        padding: 10px;
+        font-size: 16px;
+      }
+      form .form-control:focus {
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body class="text-center">
+    <form action="." method="post" enctype="multipart/form-data">
+      <h1>Blockcert Issuer</h1>
+      <div class="form-group">
+        <label for="issuer_name">Issuer name</label>
+        <input id="issuer_name" class="form-control" type="text" name="issuer_name" value="Centre for Learning and Teaching in Higher Education (CLeaR), University of Auckland" required>
+      </div>
+      <div class="form-group">
+        <label for="certificate_title">Certificate title</label>
+        <input id="certificate_title" class="form-control" type="text" name="certificate_title" value="Teaching Catalyst Certificate of Completion" required>
+      </div>
+      <div class="form-group">
+        <label for="criteria_narrative">Criteria/Narrative</label>
+        <input id="criteria_narrative" class="form-control" type="text" name="criteria_narrative" value="Teaching Catalyst" required>
+      </div>
+      <div class="form-group">
+        <label for="certificate_description">Certificate description</label>
+        <textarea class="form-control" id="certificate_description" rows=10 name="certificate_description" required>The Teaching Catalyst programme introduces academic staff to learning and teaching practices and policies at the University of Auckland and is a key objective of academic continuation. The programme culminates in the creation of a teaching portfolio for their Academic Career Portfolio.</textarea>
+      </div>
+      <div class="form-group">
+        <label for="roster">CSV file of participants</label>
+        <input id="roster" class="form-control-file" type="file" name="roster" accept=".csv" style="text-align:center" aria-describedby="rosterHelp" required>
+        <small id="rosterHelp" class="form-text text-muted">Formatted like: <br>
+name,pubkey,identity<br>
+Steve Leichtweis,ecdsa-koblitz-pubkey:slei184,s.leichtweis@auckland.ac.nz
+        </small>
+      </div>
+      <button class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
+    </form>
+  </body>
+</html>
