@@ -26,9 +26,9 @@ def root():
     os.chdir(os.path.expanduser("~/cert-tools"))
     print(cmd)
     subprocess.call(cmd)
-    f = request.files["roster"]
+    rosterf = request.files["roster"]
     rosterfile = "sample_data/rosters/roster_" + safe_name + ".csv"
-    f.save(rosterfile)
+    rosterf.save(rosterfile)
     cmd = ["instantiate-certificate-batch", "--template_file_name=" + safe_name + ".json", "--roster=" + "rosters/roster_" + safe_name + ".csv"]
     subprocess.call(cmd)
     os.chdir(os.path.expanduser("~"))
