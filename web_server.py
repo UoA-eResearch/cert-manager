@@ -34,7 +34,7 @@ def root():
     os.chdir(os.path.expanduser("~"))
     cmd = "cp cert-tools/sample_data/unsigned_certificates/" + safe_name + "* cert-issuer/conf/data/unsigned_certificates"
     subprocess.call(cmd, shell=True)
-    subprocess.call("docker run --rm -v ~/cert-issuer/conf:/etc/cert-issuer bc/cert-issuer:1.0 cert-issuer -c /etc/cert-issuer/conf.ini; rm cert-issuer/conf/data/unsigned_certificates/*", shell=True)
+    subprocess.call("docker run --rm -v ~/cert-issuer/conf:/etc/cert-issuer bc/cert-issuer:1.0 cert-issuer -c /etc/cert-issuer/conf.ini; rm cert-issuer/conf/data/unsigned_certificates/*;docker restart certviewer_web_1", shell=True)
     print("certs issued")
 
     if f.get("sendmail"):
