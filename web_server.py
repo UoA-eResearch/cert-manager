@@ -39,7 +39,9 @@ def root():
 
     if f.get("sendmail"):
       print("Sending mail!")
-      reader = csv.DictReader(request.files["roster"])
+      rosterf.seek(0)
+      reader = list(csv.DictReader(rosterf))
+      print("{} recipients".format(len(reader)))
       fromaddr = f["sending_address"]
       body_template = f["sending_body"]
       subject = f["sending_subject"]
@@ -65,4 +67,4 @@ def root():
 
 if __name__ == '__main__':
   port = int(os.environ.get('PORT', 8080))
-  app.run("0.0.0.0", port, debug=True)
+  app.run("0.0.0.0", port, debug=False)
