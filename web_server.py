@@ -6,6 +6,11 @@ import subprocess
 app = Flask(__name__, static_url_path='')
 
 import uuid
+import smtplib
+import csv
+
+def make_safe(string):
+  return "".join(char for char in string if char.isalnum())
 
 @app.route('/', methods=['GET', 'POST'])
 def root():
@@ -15,7 +20,7 @@ def root():
     print request.form
     f = request.form
     name = f["certificate_title"]
-    safe_name = "".join(c for c in name if c.isalnum())
+    safe_name = make_safe(name)
     badge_id = str(uuid.uuid4())
     cmd = ["create-certificate-template", "--issuer_name=" + f["issuer_name"], "--template_file_name=" + safe_name + ".json", "--certificate_title=" + name, "--criteria_narrative=" + f["criteria_narrative"], "--certificate_description=" + f["certificate_description"], "--badge_id=" + badge_id]
     os.chdir(os.path.expanduser("~/cert-tools"))
@@ -31,6 +36,29 @@ def root():
     subprocess.call(cmd, shell=True)
     subprocess.call("docker run --rm -v ~/cert-issuer/conf:/etc/cert-issuer bc/cert-issuer:1.0 cert-issuer -c /etc/cert-issuer/conf.ini; rm cert-issuer/conf/data/unsigned_certificates/*", shell=True)
     print("certs issued")
+
+    if f.get("sendmail"):
+      print("Sending mail!")
+      reader = csv.DictReader(request.files["roster"])
+      fromaddr = f["sending_address"]
+      body_template = f["sending_body"]
+      subject = f["sending_subject"]
+      server = smtplib.SMTP('mailhost.auckland.ac.nz')
+      for row in reader:
+        toaddr = row["identity"]
+        filename = make_safe(f["certificate_title"] + toaddr)
+        url = "https://blockcert.auckland.ac.nz/" + filename
+        body = body_template.replace("ISSUER_NAME", f["issuer_name"]).replace("CERTIFICATE_TITLE", f["certificate_title"]).replace("CERTIFICATE_DESCRIPTION", f["certificate_description"]).replace("VIEW_URL", url).replace("NAME", row["name"])
+        lines = ["From: " + fromaddr,
+                 "To: " + toaddr,
+                 "Subject: " + subject,
+                 "",
+                 body]
+        msg = "\r\n".join(lines)
+        print("Sending mail from " + fromaddr + " to " + toaddr + " with msg " + msg)
+        server.sendmail(fromaddr, toaddr, msg)
+      server.quit()
+
     os.chdir(os.path.expanduser("~/cert-manager/zips/"))
     subprocess.call("rm " + safe_name + ".zip; zip -j " + safe_name + ".zip ~/cert-issuer/conf/data/blockchain_certificates/" + safe_name + "*", shell=True)
     return send_file("zips/" + safe_name + ".zip", as_attachment=True)
