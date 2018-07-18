@@ -7,6 +7,9 @@ app = Flask(__name__, static_url_path='')
 
 import uuid
 import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
 import csv
 
 import sys
@@ -56,14 +59,14 @@ def root():
         filename = make_safe(f["certificate_title"] + toaddr)
         url = "https://blockcert.auckland.ac.nz/" + filename
         body = body_template.replace("ISSUER_NAME", f["issuer_name"]).replace("CERTIFICATE_TITLE", f["certificate_title"]).replace("CERTIFICATE_DESCRIPTION", f["certificate_description"]).replace("VIEW_URL", url).replace("NAME", row["name"])
-        lines = ["From: " + fromaddr,
-                 "To: " + toaddr,
-                 "Subject: " + subject,
-                 "",
-                 body]
-        msg = "\r\n".join(lines)
-        print("Sending mail from " + fromaddr + " to " + toaddr + " with msg " + msg)
-        server.sendmail(fromaddr, toaddr, msg)
+        msg = MIMEMultipart('alternative')
+        msg['Subject'] = subject
+        msg['From'] = fromaddr
+        msg['To'] = toaddr
+        part1 = MIMEText(body, 'html', 'utf-8')
+        msg.attach(part1)
+        print("Sending mail from " + fromaddr + " to " + toaddr + " with msg " + msg.as_string())
+        server.sendmail(fromaddr, toaddr, msg.as_string())
       server.quit()
 
     os.chdir(os.path.expanduser("~/cert-manager/zips/"))
