@@ -51,6 +51,8 @@ def root():
       reader = list(csv.DictReader(rosterf))
       print("{} recipients".format(len(reader)))
       fromaddr = f["sending_address"]
+      cc = f["sending_cc"]
+      bcc = f["sending_bcc"]
       body_template = f["sending_body"]
       subject = f["sending_subject"]
       server = smtplib.SMTP('mailhost.auckland.ac.nz')
@@ -63,10 +65,12 @@ def root():
         msg['Subject'] = subject
         msg['From'] = fromaddr
         msg['To'] = toaddr
+        msg['CC'] = cc
         part1 = MIMEText(body, 'html', 'utf-8')
         msg.attach(part1)
         print("Sending mail from " + fromaddr + " to " + toaddr + " with msg " + msg.as_string())
-        server.sendmail(fromaddr, toaddr, msg.as_string())
+        toaddrs = [toaddr] + cc.split(",") + bcc.split(",")
+        server.sendmail(fromaddr, toaddrs, msg.as_string())
       server.quit()
 
     os.chdir(os.path.expanduser("~/cert-manager/zips/"))
