@@ -9,6 +9,10 @@ import uuid
 import smtplib
 import csv
 
+import sys
+reload(sys)  # Reload is a hack
+sys.setdefaultencoding('UTF8')
+
 def make_safe(string):
   return "".join(char for char in string if char.isalnum())
 
@@ -17,8 +21,9 @@ def root():
   if request.method == "GET":
     return render_template('index.html')
   elif request.method == "POST":
-    print request.form
+    print(request.form)
     f = request.form
+
     name = f["certificate_title"]
     safe_name = make_safe(name)
     badge_id = str(uuid.uuid4())
