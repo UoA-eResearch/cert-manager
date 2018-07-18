@@ -5,8 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Blockcert Manager</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.10/summernote-bs4.css" rel="stylesheet">
+
     <style>
       html, body {
         height: 100%;
@@ -23,7 +24,7 @@
 
       form {
         width: 100%;
-        max-width: 500px;
+        max-width: 900px;
         padding: 15px;
         margin: auto;
       }
@@ -38,17 +39,6 @@
         z-index: 2;
       }
     </style>
-    <script>
-      $(document).ready(function() {
-        $("form").submit(function() {
-          console.log("submit!");
-          $("#submit").attr("disabled", true);
-        });
-        $("#sendmail").change(function() {
-          $("#sendMailSection").toggle();
-        });
-      });
-    </script>
   </head>
   <body class="text-center">
     <form action="." method="post" enctype="multipart/form-data">
@@ -94,17 +84,31 @@ Steve Leichtweis,ecdsa-koblitz-pubkey:slei184,s.leichtweis@auckland.ac.nz
         </div>
         <div class="form-group">
           <label for="sending_body">Email body</label>
-          <textarea class="form-control" id="sending_body" rows=10 name="sending_body" required>Hello NAME!
-
-ISSUER_NAME has issued you a certificate for CERTIFICATE_TITLE
-The description for this certificate is:
-CERTIFICATE_DESCRIPTION
-
+          <textarea class="form-control" id="sending_body" rows=10 name="sending_body" required>Hello NAME!<br><br>
+ISSUER_NAME has issued you a certificate for CERTIFICATE_TITLE<br>
+The description for this certificate is:<br>
+CERTIFICATE_DESCRIPTION<br><br>
 You can view it at VIEW_URL
         </textarea>
         </div>
       </div>
       <button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
     </form>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js" integrity="sha384-o+RDsa0aLu++PJvFqy8fFScvbHFLtbvScb8AjopnFD+iEQ7wo/CG0xlczd+2O/em" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.10/summernote-bs4.js"></script>
+    <script>
+      $("form").submit(function() {
+        console.log("submit!");
+        $("#submit").attr("disabled", true);
+      });
+      $("#sendmail").change(function() {
+        $("#sendMailSection").toggle();
+      });
+      $('#sending_body').summernote({
+      });
+    </script>
   </body>
 </html>
