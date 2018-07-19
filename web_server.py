@@ -60,7 +60,8 @@ def root():
         toaddr = row["identity"]
         filename = make_safe(f["certificate_title"] + toaddr)
         url = "https://blockcert.auckland.ac.nz/" + filename
-        body = body_template.replace("ISSUER_NAME", f["issuer_name"]).replace("CERTIFICATE_TITLE", f["certificate_title"]).replace("CERTIFICATE_DESCRIPTION", f["certificate_description"]).replace("VIEW_URL", url).replace("NAME", row["name"])
+        name = row.get("firstname") or row.get("name")
+        body = body_template.replace("ISSUER_NAME", f["issuer_name"]).replace("CERTIFICATE_TITLE", f["certificate_title"]).replace("CERTIFICATE_DESCRIPTION", f["certificate_description"]).replace("VIEW_URL", url).replace("NAME", name)
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = fromaddr
