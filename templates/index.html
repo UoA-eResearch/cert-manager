@@ -76,15 +76,15 @@ Steve Leichtweis,Steve,UPI:slei184,s.leichtweis@auckland.ac.nz
       <div id="sendMailSection" style="display:none">
         <div class="form-group">
           <label for="sending_address">Sending address</label>
-          <input id="sending_address" class="form-control" type="text" name="sending_address" value="blockcert@auckland.ac.nz" required>
+          <input id="sending_address" class="form-control" type="email" name="sending_address" value="blockcert@auckland.ac.nz" required>
         </div>
         <div class="form-group">
           <label for="sending_cc">CC</label>
-          <input id="sending_cc" class="form-control" type="text" name="sending_cc">
+          <input id="sending_cc" class="form-control" type="email" name="sending_cc" multiple title="Zero or more addresses, separated with ','">
         </div>
         <div class="form-group">
           <label for="sending_bcc">BCC</label>
-          <input id="sending_bcc" class="form-control" type="text" name="sending_bcc">
+          <input id="sending_bcc" class="form-control" type="email" name="sending_bcc" multiple title="Zero or more addresses, separated with ','">
         </div>
         <div class="form-group">
           <label for="sending_subject">Subject</label>
@@ -92,7 +92,7 @@ Steve Leichtweis,Steve,UPI:slei184,s.leichtweis@auckland.ac.nz
         </div>
         <div class="form-group">
           <label for="sending_body">Email body</label>
-          <textarea class="form-control" id="sending_body" rows=10 name="sending_body" required>Hello NAME!<br><br>
+          <textarea class="form-control" id="sending_body" rows=10 name="sending_body" required>Hello FIRSTNAME!<br><br>
 ISSUER_NAME has issued you a certificate for CERTIFICATE_TITLE<br>
 The description for this certificate is:<br>
 CERTIFICATE_DESCRIPTION<br><br>

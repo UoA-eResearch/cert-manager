@@ -36,7 +36,16 @@ def root():
     subprocess.call(cmd)
     rosterf = request.files["roster"]
     rosterfile = "sample_data/rosters/roster_" + safe_name + ".csv"
-    rosterf.save(rosterfile)
+    
+    roster = list(csv.DictReader(rosterf))
+    with open(rosterfile, "wb") as csvfile:
+      writer = csv.DictWriter(csvfile, fieldnames=["name", "pubkey", "identity"]) # write only these 3 fields to the roster csv - stripping out any additional fields - like firstname (which is just used for emails)
+      writer.writeheader()
+      for row in roster:
+        if ":" not in row["pubkey"]:
+          row["pubkey"] = "ID:" + row["pubkey"]
+        writer.writerow({"name": row["name"], "pubkey": row["pubkey"], "identity": row["identity"]})
+
     cmd = ["instantiate-certificate-batch", "--template_file_name=" + safe_name + ".json", "--roster=" + "rosters/roster_" + safe_name + ".csv"]
     subprocess.call(cmd)
     os.chdir(os.path.expanduser("~"))
@@ -47,21 +56,19 @@ def root():
 
     if f.get("sendmail"):
       print("Sending mail!")
-      rosterf.seek(0)
-      reader = list(csv.DictReader(rosterf))
-      print("{} recipients".format(len(reader)))
+      print("{} recipients".format(len(roster)))
       fromaddr = f["sending_address"]
       cc = f["sending_cc"]
       bcc = f["sending_bcc"]
       body_template = f["sending_body"]
       subject = f["sending_subject"]
       server = smtplib.SMTP('mailhost.auckland.ac.nz')
-      for row in reader:
+      for row in roster:
         toaddr = row["identity"]
         filename = make_safe(f["certificate_title"] + toaddr)
         url = "https://blockcert.auckland.ac.nz/" + filename
         name = row.get("firstname") or row.get("name")
-        body = body_template.replace("ISSUER_NAME", f["issuer_name"]).replace("CERTIFICATE_TITLE", f["certificate_title"]).replace("CERTIFICATE_DESCRIPTION", f["certificate_description"]).replace("VIEW_URL", url).replace("NAME", name)
+        body = body_template.replace("ISSUER_NAME", f["issuer_name"]).replace("CERTIFICATE_TITLE", f["certificate_title"]).replace("CERTIFICATE_DESCRIPTION", f["certificate_description"]).replace("VIEW_URL", url).replace("FIRSTNAME", name).replace("NAME", name)
         msg = MIMEMultipart('alternative')
         msg['Subject'] = subject
         msg['From'] = fromaddr
