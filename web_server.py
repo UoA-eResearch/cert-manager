@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, request, send_file
+from flask import Flask, render_template, request, send_file, abort
 import os
 import subprocess
 app = Flask(__name__, static_url_path='')
@@ -37,9 +37,20 @@ def root():
     rosterf = request.files["roster"]
     rosterfile = "sample_data/rosters/roster_" + safe_name + ".csv"
     
+    try:
+      rosterf.read().decode("utf-8")
+    except UnicodeDecodeError:
+      abort(400, "The csv file must be encoded in UTF-8")
+    rosterf.seek(0)
     roster = list(csv.DictReader(rosterf))
+    if not roster:
+      abort(400, "The csv file must contain at least one row")
     with open(rosterfile, "wb") as csvfile:
-      writer = csv.DictWriter(csvfile, fieldnames=["name", "pubkey", "identity"]) # write only these 3 fields to the roster csv - stripping out any additional fields - like firstname (which is just used for emails)
+      fieldnames = ["name", "pubkey", "identity"]
+      writer = csv.DictWriter(csvfile, fieldnames=fieldnames) # write only these 3 fields to the roster csv - stripping out any additional fields - like firstname (which is just used for emails)
+      for field in fieldnames:
+        if field not in roster[0]:
+          abort(400, 'The csv file must contain a ' + field + ' column')
       writer.writeheader()
       for row in roster:
         if ":" not in row["pubkey"]:
