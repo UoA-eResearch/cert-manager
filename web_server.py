@@ -42,7 +42,13 @@ def root():
     except UnicodeDecodeError:
       abort(400, "The csv file must be encoded in UTF-8")
     rosterf.seek(0)
-    roster = list(csv.DictReader(rosterf))
+    if rosterf.read(3) == "\xef\xbb\xbf": #BOM
+      pass
+    else:
+      rosterf.seek(0)
+    roster = csv.DictReader(rosterf)
+    roster.fieldnames = [field.strip().lower() for field in roster.fieldnames]
+    roster = list(roster)
     if not roster:
       abort(400, "The csv file must contain at least one row")
     with open(rosterfile, "wb") as csvfile:
