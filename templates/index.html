@@ -67,7 +67,7 @@ name,firstname,pubkey,identity<br>
 Steve Leichtweis,Steve,UPI:slei184,s.leichtweis@auckland.ac.nz
         </small>
       </div>
-      <div class="form-check">
+      <div class="form-check" style="margin-bottom: 20px">
         <input class="form-check-input" type="checkbox" name="sendmail" id="sendmail">
         <label class="form-check-label" for="sendmail">
           Send emails? (assuming email is in the identity field)
@@ -97,7 +97,8 @@ ISSUER_NAME has issued you a certificate for CERTIFICATE_TITLE<br>
 The description for this certificate is:<br>
 CERTIFICATE_DESCRIPTION<br><br>
 You can view it at VIEW_URL
-        </textarea>
+          </textarea>
+          <div id="sending_body_help" class="alert alert-success" role="alert">Email body looks good :)</div>
         </div>
       </div>
       <button id="submit" class="btn btn-lg btn-primary btn-block" type="submit">Submit</button>
@@ -115,7 +116,29 @@ You can view it at VIEW_URL
       $("#sendmail").change(function() {
         $("#sendMailSection").toggle();
       });
+      function validateEditor() {
+        var markup = $("#sending_body").summernote("code");
+        $("#submit").attr("disabled", true);
+        $("#sending_body_help").attr("class", "alert alert-danger");
+        if (markup == "") {
+          $("#sending_body_help").text("Email body must not be empty!");
+        } else if (markup.indexOf("VIEW_URL") === -1) {
+          $("#sending_body_help").text("Email body must include VIEW_URL!");
+        } else {
+          $("#sending_body_help").text("Email body looks good :)");
+          $("#sending_body_help").attr("class", "alert alert-success");
+          $("#submit").attr("disabled", false);
+        }
+      }
       $('#sending_body').summernote({
+        callbacks: {
+          onKeyup: function() {
+            validateEditor();
+          },
+          onPaste: function() {
+            validateEditor();
+          }
+        }
       });
     </script>
   </body>
