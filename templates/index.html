@@ -60,6 +60,16 @@
         <textarea class="form-control" id="certificate_description" rows=10 name="certificate_description" required>The Teaching Catalyst programme introduces academic staff to learning and teaching practices and policies at the University of Auckland and is a key objective of academic continuation. The programme culminates in the creation of a teaching portfolio for their Academic Career Portfolio.</textarea>
       </div>
       <div class="form-group">
+        <label for="issuer_logo_file">Issuer logo</label>
+        <input type="file" class="form-control-file" id="issuer_logo_file" name="issuer_logo_file" accept="image/png">
+        <img id='issuer_logo_file_preview' src="images/uoa-logo-200.png"/>
+      </div>
+      <div class="form-group">
+        <label for="cert_image_file">Certificate image</label>
+        <input type="file" class="form-control-file" id="cert_image_file" name="cert_image_file" accept="image/png">
+        <img id='cert_image_file_preview' src="images/certificate-image.png"/>
+      </div>
+      <div class="form-group">
         <label for="roster">CSV file of participants</label>
         <input id="roster" class="form-control-file" type="file" name="roster" accept=".csv" style="text-align:center" aria-describedby="rosterHelp" required>
         <small id="rosterHelp" class="form-text text-muted">Formatted like: <br>
@@ -138,6 +148,19 @@ You can view it at VIEW_URL
           onPaste: function() {
             validateEditor();
           }
+        }
+      });
+
+      $("#cert_image_file,#issuer_logo_file").change(function(event) {
+        console.log(this, event);
+        if (this.files && this.files[0]) {
+          var reader = new FileReader();
+          var previewImg = "#" + this.id + "_preview";
+          reader.onload = function (e) {
+            console.log(e);
+            $(previewImg).attr('src', e.target.result);
+          }
+          reader.readAsDataURL(this.files[0]);
         }
       });
     </script>

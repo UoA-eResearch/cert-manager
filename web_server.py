@@ -26,12 +26,27 @@ def root():
   elif request.method == "POST":
     print(request.form)
     f = request.form
+    os.chdir(os.path.expanduser("~/cert-tools"))
 
     name = f["certificate_title"]
     safe_name = make_safe(name)
+    issuer_logo_file = request.files["issuer_logo_file"]
+    issuer_logo_filename = "sample_data/images/" + safe_name + "_" + issuer_logo_file.filename
+    issuer_logo_file.save(issuer_logo_filename)
+    cert_image_file = request.files["cert_image_file"]
+    cert_image_file_filename = "sample_data/images/" + safe_name + "_" + cert_image_file.filename
+    cert_image_file.save(cert_image_file_filename)
     badge_id = str(uuid.uuid4())
-    cmd = ["create-certificate-template", "--issuer_name=" + f["issuer_name"], "--template_file_name=" + safe_name + ".json", "--certificate_title=" + name, "--criteria_narrative=" + f["criteria_narrative"], "--certificate_description=" + f["certificate_description"], "--badge_id=" + badge_id]
-    os.chdir(os.path.expanduser("~/cert-tools"))
+    cmd = [ "create-certificate-template",
+            "--issuer_name=" + f["issuer_name"],
+            "--template_file_name=" + safe_name + ".json",
+            "--certificate_title=" + name,
+            "--criteria_narrative=" + f["criteria_narrative"],
+            "--certificate_description=" + f["certificate_description"],
+            "--badge_id=" + badge_id,
+            "--issuer_logo_file=" + issuer_logo_filename,
+            "--cert_image_file=" + cert_image_file_filename,
+    ]
     print(cmd)
     subprocess.call(cmd)
     rosterf = request.files["roster"]
