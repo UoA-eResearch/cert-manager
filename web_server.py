@@ -46,13 +46,13 @@ def root():
 
     issuer_logo_file = request.files.get("issuer_logo_file")
     if issuer_logo_file:
-      issuer_logo_filename = "sample_data/images/" + safe_name + "_" + issuer_logo_file.filename
-      issuer_logo_file.save(issuer_logo_filename)
+      issuer_logo_filename = "images/" + safe_name + "_" + issuer_logo_file.filename
+      issuer_logo_file.save("sample_data/" + issuer_logo_filename)
       cmd.append("--issuer_logo_file=" + issuer_logo_filename)
     cert_image_file = request.files.get("cert_image_file")
     if cert_image_file:
-      cert_image_file_filename = "sample_data/images/" + safe_name + "_" + cert_image_file.filename
-      cert_image_file.save(cert_image_file_filename)
+      cert_image_file_filename = "images/" + safe_name + "_" + cert_image_file.filename
+      cert_image_file.save("sample_data/" + cert_image_file_filename)
       cmd.append("--cert_image_file=" + cert_image_file_filename)
 
     print(cmd)
