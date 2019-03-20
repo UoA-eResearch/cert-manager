@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from flask import Flask, render_template, request, send_file, abort
+from flask import Flask, render_template, request, send_file, send_from_directory, abort
 import os
 import subprocess
 app = Flask(__name__, static_url_path='')
@@ -15,6 +15,10 @@ import csv
 import sys
 reload(sys)  # Reload is a hack
 sys.setdefaultencoding('UTF8')
+
+@app.route('/images/<path:path>')
+def send_image(path):
+    return send_from_directory('templates/images', path)
 
 def make_safe(string):
   return "".join(char for char in string if char.isalnum())
