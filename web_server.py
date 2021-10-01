@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 from flask import Flask, render_template, request, send_file, send_from_directory, abort
 import os
@@ -10,11 +10,7 @@ import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-import csv
-
-import sys
-reload(sys)  # Reload is a hack
-sys.setdefaultencoding('UTF8')
+import pandas as pd
 
 @app.route('/images/<path:path>')
 def send_image(path):
@@ -55,43 +51,29 @@ def root():
       cert_image_file.save("sample_data/" + cert_image_file_filename)
       cmd.append("--cert_image_file=" + cert_image_file_filename)
 
-    print(cmd)
+    print(" ".join(cmd))
     subprocess.call(cmd)
     rosterf = request.files["roster"]
     rosterfile = "sample_data/rosters/roster_" + safe_name + ".csv"
     
-    try:
-      rosterf.read().decode("utf-8")
-    except UnicodeDecodeError:
-      abort(400, "The csv file must be encoded in UTF-8")
-    rosterf.seek(0)
-    if rosterf.read(3) == "\xef\xbb\xbf": #BOM
-      pass
-    else:
-      rosterf.seek(0)
-    roster = csv.DictReader(rosterf)
-    roster.fieldnames = [field.strip().lower() for field in roster.fieldnames]
-    roster = list(roster)
-    if not roster:
+    roster = pd.read_csv(rosterf)
+    print(roster)
+    if len(roster) == 0:
       abort(400, "The csv file must contain at least one row")
-    with open(rosterfile, "wb") as csvfile:
-      fieldnames = ["name", "pubkey", "identity"]
-      writer = csv.DictWriter(csvfile, fieldnames=fieldnames) # write only these 3 fields to the roster csv - stripping out any additional fields - like firstname (which is just used for emails)
-      for field in fieldnames:
-        if field not in roster[0]:
-          abort(400, 'The csv file must contain a ' + field + ' column')
-      writer.writeheader()
-      for row in roster:
-        if ":" not in row["pubkey"]:
-          row["pubkey"] = "ID:" + row["pubkey"]
-        writer.writerow({"name": row["name"], "pubkey": row["pubkey"], "identity": row["identity"]})
+    if not all(k in roster.keys() for k in ["name", "pubkey", "identity"]):
+      abort(400, 'The csv file must contain name, pubkey, and identity')
+    for i in range(len(roster)):
+      if ":" not in roster.pubkey[i]:
+        roster.pubkey[i] = "ID:" + roster.pubkey[i]
+    roster[["name", "pubkey", "identity"]].to_csv(rosterfile, index=False)
 
     cmd = ["instantiate-certificate-batch", "--template_file_name=" + safe_name + ".json", "--roster=" + "rosters/roster_" + safe_name + ".csv"]
+    print(" ".join(cmd))
     subprocess.call(cmd)
     os.chdir(os.path.expanduser("~"))
     cmd = "cp cert-tools/sample_data/unsigned_certificates/" + safe_name + "* cert-issuer/conf/data/unsigned_certificates"
     subprocess.call(cmd, shell=True)
-    subprocess.call("docker run --rm -v ~/cert-issuer/conf:/etc/cert-issuer bc/cert-issuer:1.0 cert-issuer -c /etc/cert-issuer/conf.ini; rm cert-issuer/conf/data/unsigned_certificates/*;docker restart certviewer_web_1", shell=True)
+    subprocess.call("docker run --rm -v ~/cert-issuer/conf:/etc/cert-issuer bc/cert-issuer:1.0 cert-issuer -c /etc/cert-issuer/conf.ini; rm cert-issuer/conf/data/unsigned_certificates/*;docker restart cert-viewer_web_1", shell=True)
     print("certs issued")
 
     if f.get("sendmail"):
@@ -103,7 +85,7 @@ def root():
       body_template = f["sending_body"]
       subject = f["sending_subject"]
       server = smtplib.SMTP('mailhost.auckland.ac.nz')
-      for row in roster:
+      for i, row in roster.iterrows():
         toaddr = row["identity"]
         filename = make_safe(f["certificate_title"] + toaddr)
         url = "https://blockcert.auckland.ac.nz/" + filename
