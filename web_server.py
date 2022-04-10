@@ -57,6 +57,7 @@ def root():
     rosterfile = "sample_data/rosters/roster_" + safe_name + ".csv"
     
     roster = pd.read_csv(rosterf)
+    roster.columns = roster.columns.str.strip()
     print(roster)
     if len(roster) == 0:
       abort(400, "The csv file must contain at least one row")
